@@ -3,6 +3,8 @@
 #include <algorithm>
 using namespace std;
 
+// 顺序容器，存储与位置相关
+
 /*******************************************************
  * vector容器 using std::vector
  * 类模板,通过类模板进行实例化，因此需要包含类型vector<type>
@@ -15,6 +17,7 @@ using namespace std;
  * vector 最常用的就是定义一个空的vector,然后一直添加元素
  * 初始化的是一个列表时，只能使用{}
  * ()初始化只能采用数量、默认值的直接初始化方式
+ * 自定义类型无默认构造参数时，初始化需指定默认构造
  * vector<T> v;
  * vector(n,elem);
  * vector(v.begin(),v.end());
@@ -41,6 +44,8 @@ void func_demo1()
 
     vector<int> v11;
 	v11.assign(10, 100);
+
+ //   vector<noDefault> v(10,init);
 }
 /********************************************
  * 类型不匹配时的初始化需要考虑构造初始化
@@ -130,6 +135,7 @@ class Person {
 void test02()
 {
     vector<Person*> v;
+    vector<Person> v2;
 
     Person p1("aaa", 10);
     Person p2("bbb", 20);
@@ -138,6 +144,8 @@ void test02()
     v.push_back(&p1);
     v.push_back(&p2);
     v.push_back(&p3);
+
+    v2.emplace_back("ddd",40);
 
     for(vector<Person*>::iterator it = v.begin;it != v.end();it++) {
         // cout << (**it).mName << endl;
@@ -175,15 +183,15 @@ void test03()
             cout << *vit << endl;
 }
 
-/*************************************
+/*************************************************
  * vector capation v.capacity()
  * vector size     v.size()
  * vector empty    v.empty()
  * vector resize(int num)
  * vector resize(int num , elem)
  * vector reserve(int len)
- * vector swap(vec);
-**************************************/
+ * vector swap(vec); 只交换了两个容器内的数据结构
+*************************************************/
 void test04()
 {
  	vector<int> v;
@@ -202,8 +210,16 @@ void test04()
 	cout << "v的大小为：" << v.size() << endl;
 }
 
+/*******************************************
+ * vector 比较
+ * 实则进行元素的逐一对比，需要指定比较运算符
+ * 默认类型具有比较运算符
+ ******************************************/ 
+
 /*****************************************************
  * push_back(elem);
+ * emplace_back(elem);
+ * emplace_back(const_iterator pos,elem);
  * pop_back();
  * insert(const_iterator pos,elem);
  * insert(const_iterator pos,int num , elem);
@@ -213,8 +229,8 @@ void test04()
 ******************************************************/
 
 /****************************************
- * front()
- * back()
- * at(int idx)
+ * vector非空的情况下
+ * front | back()                 v.front()
+ * at(int idx) 会进行越界判断操作   v.at(0)
  * operator[]
 ****************************************/
