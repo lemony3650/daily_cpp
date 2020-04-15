@@ -3,21 +3,21 @@
 #include <algorithm>
 using namespace std;
 
-// ˳���������洢��λ�����
+// 顺序容器，存储与位置相关
 
 /*******************************************************
- * vector���� using std::vector
- * ��ģ��,ͨ����ģ�����ʵ�����������Ҫ��������vector<type>
- * �������Ͳ�����vector�����ò���һ������
+ * vector容器 using std::vector
+ * 类模板,通过类模板进行实例化，因此需要包含类型vector<type>
+ * 引用类型不能是vector，引用不是一个对象
  * vector<type> value
  * vector<vector<string> > value
 ******************************************************/
 
 /******************************************************
- * vector ��õľ��Ƕ���һ���յ�vector,Ȼ��һֱ����Ԫ��
- * ��ʼ������һ���б�ʱ��ֻ��ʹ��{}
- * ()��ʼ��ֻ�ܲ���������Ĭ��ֵ��ֱ�ӳ�ʼ����ʽ
- * �Զ���������Ĭ�Ϲ������ʱ����ʼ����ָ��Ĭ�Ϲ���
+ * vector 最常用的就是定义一个空的vector,然后一直添加元素
+ * 初始化的是一个列表时，只能使用{}
+ * ()初始化只能采用数量、默认值的直接初始化方式
+ * 自定义类型无默认构造参数时，初始化需指定默认构造
  * vector<T> v;
  * vector(n,elem);
  * vector(v.begin(),v.end());
@@ -48,8 +48,8 @@ void func_demo1()
  //   vector<noDefault> v(10,init);
 }
 /********************************************
- * ���Ͳ�ƥ��ʱ�ĳ�ʼ����Ҫ���ǹ����ʼ��
- * ���������Զ�ʶ��v1{10}�е�10��������
+ * 类型不匹配时的初始化需要考虑构造初始化
+ * 编译器会自动识别v1{10}中的10代表数量
 *********************************************/
 void func_demo2()
 {
@@ -59,9 +59,9 @@ void func_demo2()
 }
 
 /***********************************************
- * ����ͨ�� for+i �ķ�ʽ��vector���г�ʼ������
- * vectorֻ֧���Ѿ����ڵ�Ԫ��ֵ�±����
- * push_back()����Ԫ�أ��ڶ�β����β��Ԫ��
+ * 不能通过 for+i 的方式对vector进行初始化操作
+ * vector只支持已经存在的元素值下标访问
+ * push_back()添加元素，在队尾添加尾端元素
 ************************************************/
 void func_demo3()
 {
@@ -71,8 +71,8 @@ void func_demo3()
         text.push_back(word);
 }
 /**************************************
- * ͳ�Ʒ����ε�ռ�����
- * vector �±�����ڷ����Ѿ����ڵ�Ԫ��
+ * 统计分数段的占比情况
+ * vector 下标可用于访问已经存在的元素
 **************************************/
 void func_demo4()
 {
@@ -85,7 +85,7 @@ void func_demo4()
 }
 
 /*******************************************
- * ��������vector�ķ�ʽ
+ * 遍历容器vector的方式
  * 1.vector<int>::iterator it_b,it_e
  * 2.for(vector<int>::iterator it = v.begin())
  * 3.for_each(v.begin(),v.end(),function)
@@ -122,8 +122,8 @@ void test01()
 }
 
 /***************************************
- * ���ָ�����͵��Զ�����������
- * itָ�������֮���*it����ǰ�����������
+ * 存放指针类型的自定义类型容器
+ * it指针解引用之后的*it代表前面的数据类型
 ****************************************/
 class Person {
     public:
@@ -155,7 +155,7 @@ void test02()
 }
 
 /*********************************
- * vector���͵�vector������������
+ * vector类型的vector容器遍历过程
 *********************************/ 
 void test03()
 {
@@ -172,7 +172,7 @@ void test03()
 		v3.push_back(i + 3);
 		v4.push_back(i + 4);
 	}
-	//������Ԫ�ز��뵽vector v��
+	//将容器元素插入到vector v中
 	v.push_back(v1);
 	v.push_back(v2);
 	v.push_back(v3);
@@ -190,7 +190,7 @@ void test03()
  * vector resize(int num)
  * vector resize(int num , elem)
  * vector reserve(int len)
- * vector swap(vec); ֻ���������������ڵ����ݽṹ
+ * vector swap(vec); 只交换了两个容器内的数据结构
 *************************************************/
 void test04()
 {
@@ -199,21 +199,21 @@ void test04()
 		v.push_back(i);
 	}
 
-	cout << "v������Ϊ��" << v.capacity() << endl;
-	cout << "v�Ĵ�СΪ��" << v.size() << endl;
+	cout << "v的容量为：" << v.capacity() << endl;
+	cout << "v的大小为：" << v.size() << endl;
 
 	v.resize(3);
-    //�����ڴ�
-	vector<int>(v).swap(v); //��������
+    //收缩内存
+	vector<int>(v).swap(v); //匿名对象
 
-	cout << "v������Ϊ��" << v.capacity() << endl;
-	cout << "v�Ĵ�СΪ��" << v.size() << endl;
+	cout << "v的容量为：" << v.capacity() << endl;
+	cout << "v的大小为：" << v.size() << endl;
 }
 
 /*******************************************
- * vector �Ƚ�
- * ʵ�����Ԫ�ص���һ�Աȣ���Ҫָ���Ƚ������
- * Ĭ�����;��бȽ������
+ * vector 比较
+ * 实则进行元素的逐一对比，需要指定比较运算符
+ * 默认类型具有比较运算符
  ******************************************/ 
 
 /*****************************************************
@@ -229,8 +229,8 @@ void test04()
 ******************************************************/
 
 /****************************************
- * vector�ǿյ������
+ * vector非空的情况下
  * front | back()                 v.front()
- * at(int idx) �����Խ���жϲ���   v.at(0)
+ * at(int idx) 会进行越界判断操作   v.at(0)
  * operator[]
 ****************************************/
