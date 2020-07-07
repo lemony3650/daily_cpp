@@ -226,6 +226,31 @@ void quickSort(int *arr, int size)
 }
 
 
+
+/*****************************************************
+ * ¶þ·Ö²éÕÒ 
+ * 
+ * 
+******************************************************/
+int bsearch(int *arr, int length, int value)
+{
+    int low = 0;
+    int high = length - 1;
+
+    while (low <= high) {
+        int mid = (high - low)/2 + low;
+        if (arr[mid] == value) {
+            return mid;
+        }else if (arr[mid] > value){
+            high = mid - 1;
+        }else
+            low = mid + 1;
+    }
+
+    return -1;
+}
+
+
 /*****************************************************
  * 
  * 
