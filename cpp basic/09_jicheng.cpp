@@ -38,7 +38,8 @@ public:
         // m_C 派生类访问不到基类私有
     }
     // 同时派生类类外访问不到m_B 
-}
+};
+
 class son2 : protected Base
 {
 public:
@@ -49,7 +50,8 @@ public:
         // m_C 派生类访问不到基类私有
     }
     // 同时派生类类外访问不到任何
-}
+};
+
 class son3 : protected Base
 {
 public:
@@ -58,7 +60,7 @@ public:
         //派生类访问不到基类私有
     }
     // 同时派生类类外访问不到任何
-}
+};
 
 /*****************************************************************
  * 虚继承和虚基类 - 菱形继承关系
@@ -73,18 +75,9 @@ class animal
 public:
     int a_Age;
 };
-class sheep:virtual public animal
-{
-
-};
-class tuo:virtual public animal
-{
-
-};
-class sheeptuo:public sheep, public tuo
-{
-
-};
+class sheep:virtual public animal{};
+class tuo:virtual public animal{};
+class sheeptuo:public sheep, public tuo{};
 
 void test02()
 {
@@ -128,14 +121,21 @@ void doSpeak(Animal &p)
 
 /*************************************************************************
  * 多态本质
- * 1.空类占一个字节
- * 2.虚函数基类占四个字节，基类内部 一个指针vfptr -> vftable &Animal::speak
- *   子类重写父类虚函数   派生类内部 一个指针vfptr -> vftable &Cat::speak
+ * 1. 空类占一个字节
+ * 2. 同一个类的不同实例共享一个虚函数表(编译时产生)
+      而每个类内有一个指向一个指针数组(虚函数表)的指针vfptr
+ *   虚函数基类内部
+      1. 存在一个指针vfptr -> vftable &Animal::speak  (占四个字节)
+ *   派生类内部 
+      1. 首先完全继承基类的成员属性，包括指向基类虚函数表的指针vfptr
+      2. 当发生重写时，指针vfptr 便指向了派生类内部的函数  -> vftable &Cat::speak
+      3. 当派生类也创建虚函数时，会在基类虚函数表后面添加，因此sizeof()不变
+      4. 当发生多继承时，按顺序创建虚函数表及多个vfptr
 --------------------------------------------------------------------------
- * 纯虚函数，抽象类（无法实例化对象）
- * 一般由于基类的虚函数没有用，用不到，因此写成纯虚函数
- * virtual void func() = 0;
- * 子类必须重写父类虚函数
+ * 纯虚函数，即存在至少一个纯虚函数的类，称为抽象类（无法实例化对象）, 无函数体
+  1. 一般由于基类的虚函数没有用，用不到，因此写成纯虚函数
+  2. virtual void func() = 0;
+  3. 子类必须重写父类虚函数
 *************************************************************************/
 class Calculate
 {
@@ -147,7 +147,7 @@ public:
 
     int m_Num1;
     int m_Num2;
-}
+};
 
 class AddCalculate:public Calculate
 {
@@ -155,7 +155,7 @@ class AddCalculate:public Calculate
     {
         return m_Num1 + m_Num2;
     }
-}
+};
 
 void test02()
 {
@@ -174,33 +174,30 @@ void test02()
 ******************************************************************/
 
 /****************************************************************
-公有继承的方式，通过在基类声明虚函数，表明希望派生类进行覆盖
-而在派生类中添加关键字 override 声明改写自己的虚函数
-以防止在派生类中由于参数列表的不同产生一个新的函数，但虚函数却没覆盖掉
-final 表示不允许被覆盖，即不能再被继承
+公有继承的方式中
+    通过在基类声明虚函数，表明希望派生类进行覆盖
+    在派生类中添加关键字 override 声明改写自己的虚函数
+    以防止在派生类中由于参数列表的不同产生一个新的函数，而虚函数却没覆盖掉
+    final 表示不允许被覆盖，即不能再被继承
+------------------------------------------------------------------
+ * 根据传入的item对象不同，而调用不同的虚函数，实现动态绑定
+ * 根据形参决定运行的版本，即在运行时选择函数版本，动态绑定又称运行时绑定
 *****************************************************************/
 class Quote {
-    public:
-        string isbn() const;
-        // 除构造函数外的非静态函数都可以是虚函数
-        // virtual 只能出现在类内部声明，而不能出现在外部定义
-        virtual double net_price(size_t n) const;
-};
-/***********************************************
-派生类声明： class Bulk_quote;
-派生时基类必须被定义
-派生类在继承基类的虚函数时必须重新定义，以覆盖基类
-************************************************/
-class Bulk_quote:public Quote {
-    public:
-        double net_price(size_t n) const override; 
+public:
+    string isbn() const;
+    // 除构造函数外的非静态函数都可以是虚函数
+
+    // virtual 只能出现在类内部声明，而不能出现在外部定义
+    virtual double net_price(size_t n) const;
 };
 
-/***************************************************************
-根据传入的item对象不同，而调用不同的虚函数，实现动态绑定
-根据形参决定运行的版本，即在运行时选择函数版本，动态绑定又称运行时绑定
-****************************************************************/
-double print_total(ostream &os,const Quote &item,size_t n)
+class Bulk_quote:public Quote {
+public:
+    double net_price(size_t n) const override; 
+};
+
+double print_total(ostream &os, const Quote &item, size_t n)
 {
     double ret = item.net_price(n);
     os << "ISBN: " <<  item.isbn()  << " # sold: " 
@@ -210,106 +207,106 @@ double print_total(ostream &os,const Quote &item,size_t n)
 }
 
 /******************************************************************
-通过公有继承
-派生类能够向基类进行隐式的类型转换，是由于派生类对象中含有与基类对应的部分
-而不存在基类转向派生类的方式
-当派生类初始化基类时只会初始化共同存在的部分，派生类其余部分则会被砍掉
+ * 通过公有继承
+    派生类能够向基类进行隐式的类型转换，是由于派生类对象中含有与基类对应的部分
+    而不存在基类转向派生类的方式
+    当派生类初始化基类时只会初始化共同存在的部分，派生类其余部分则会被砍掉
+-------------------------
+完善定义Quote基类
 *******************************************************************/
-
-//完善定义Quote基类
 class Quote {
-    public:
-        Quote() = default;
-        Quote(const string &book, double sales_price):
-            bookNo(book),price(sales_price){}
+public:
+    Quote() = default;
+    Quote(const string &book, double sales_price):
+        bookNo(book),price(sales_price){}
 
-        string isbn() const {return bookNo;};
-        virtual double net_price(size_t n) const
-                                {return n * price;};
+    string isbn() const {return bookNo;};
+    virtual double net_price(size_t n) const
+                            {return n * price;};
 
-        // 虚析构函数
-        virtual ~Quote() = default;
+    // 虚析构函数
+    virtual ~Quote() = default;
 
-        //基类中的静态成员无论派生出多少个，都是唯一存在的一个实例对象
-        //遵循访问控制
-        static int flag;
-    private:
-        string bookNo;
-    protected:
-        double price = 0.0;
+    //基类中的静态成员无论派生出多少个，都是唯一存在的一个实例对象
+    //遵循访问控制
+    static int flag;
+private:
+    string bookNo;
+protected:
+    double price = 0.0;
 };
 
 // 完善派生类
 class Bulk_quote:public Quote {
-    public:
-        Bulk_quote() = default;
-        Bulk_quote(const string &book, double p, size_t qty, double disc):
-                    Quote(book,p),min_qty(qty),discount(discount){};
+public:
+    Bulk_quote() = default;
+    Bulk_quote(const string &book, double p, size_t qty, double disc):
+                Quote(book,p),min_qty(qty),discount(discount){};
 
-        // 派生类成员自己的成员函数实现       
-        double net_price(size_t cnt) const override
-        {
-            if(cnt >= min_qty)
-                return cnt * (1 - discount) * price;
-            else 
-                return cnt * price;
-        };
-        // public继承 还存在基类的函数和成员
+    // 派生类成员自己的成员函数实现       
+    double net_price(size_t cnt) const override
+    {
+        if(cnt >= min_qty)
+            return cnt * (1 - discount) * price;
+        else 
+            return cnt * price;
+    };
+    // public继承 还存在基类的函数和成员
 
-        //using 可以改变类中的访问控制
-        using Quote::price;
-    private:
-        size_t min_qty = 0;                 // 满足折扣的最小购买量
-        double discount = 0.0;              // 折扣额
+    //using 可以改变类中的访问控制
+    using Quote::price;
+private:
+    size_t min_qty = 0;                 // 满足折扣的最小购买量
+    double discount = 0.0;              // 折扣额
 };
 
 
 /**********************************************************************
-一个类既可以是基类，也可以是派生类，即通过基类继承得到D1，而D2又通过D1继承而来
-因此为防止不需要的继承，可以声明关键字 final
+ * 一个类既可以是基类，也可以是派生类，即通过基类继承得到D1，而D2又通过D1继承而来
+   因此为防止不需要的继承，可以声明关键字 final
 ***********************************************************************/
 class NoDervived final{};
 
 class Quote {
-    public:
-        Quote() = default;
-        Quote(const string &book, double sales_price):
-            bookNo(book),price(sales_price){}
+public:
+    Quote() = default;
+    Quote(const string &book, double sales_price):
+        bookNo(book),price(sales_price){}
 
-        string isbn() const {return bookNo;};
-        virtual double net_price(size_t n) const
-                                {return n * price;};
-        virtual ~Quote() = default;
-    private:
-        string bookNo;
-    protected:
-        double price = 0.0;
+    string isbn() const {return bookNo;};
+    virtual double net_price(size_t n) const
+                            {return n * price;};
+    virtual ~Quote() = default;
+private:
+    string bookNo;
+protected:
+    double price = 0.0;
 };
 
 /****************************************************************
-一般是通过重构的方式添加派生类对象
-即只保存购买量和折扣值，具体打折措施由派生类去做
-不能直接定义Disc_quote对象，必须通过派生并覆盖net_price方式实现
+ * 一般是通过重构的方式添加派生类对象
+    即只保存购买量和折扣值，具体打折措施由派生类去做
+    不能直接定义Disc_quote对象，必须通过派生并覆盖net_price方式实现
 *****************************************************************/
 class Disc_quote:public Quote {
-    public:
-        Disc_quote() = default;
-        Disc_quote(const string &book, double price,size_t qty,double disc):
-            Quote(book,price),quantity(qty),discount(disc){}
+public:
+    Disc_quote() = default;
+    Disc_quote(const string &book, double price,size_t qty,double disc):
+        Quote(book,price),quantity(qty),discount(disc){}
 
-        // 纯虚函数，无实际意义，限制用户使用类
-        double net_price(size_t) const = 0;
-    protected:
-        size_t quantity = 0;
-        double discount = 0.0;
+    // 纯虚函数，无实际意义，限制用户使用类
+    double net_price(size_t) const = 0;
+protected:
+    size_t quantity = 0;
+    double discount = 0.0;
 };
 /*******************************************************
-通过直接基类Disc_quote派生出Bulk_quote，间接基类Quote
+ * 通过直接基类 Disc_quote 派生出 Bulk_quote，间接基类Quote
 *******************************************************/
 class Bulk_quote:public Disc_quote {
-    public:
-        Bulk_quote() = default;
-        Bulk_quote(const string &book, double p, size_t qty, double disc):
-                    Disc_quote(book,p,qty,discount){};
-        double net_price(size_t) const override;
+public:
+    Bulk_quote() = default;
+    Bulk_quote(const string &book, double p, size_t qty, double disc):
+                Disc_quote(book,p,qty,discount){};
+    double net_price(size_t) const override;
 };
