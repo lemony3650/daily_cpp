@@ -1,23 +1,28 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+
 using namespace std;
 
 // 顺序容器，存储与位置相关
 
 /*******************************************************
- * vector容器 using std::vector
+ * vector容器 
+   using std::vector
  * 类模板,通过类模板进行实例化，因此需要包含类型vector<type>
  * 引用类型不能是vector，引用不是一个对象
- * vector<type> value
- * vector<vector<string> > value
+    vector<type> value
+    vector<vector<string> > value
 ******************************************************/
 
 /******************************************************
- * vector 最常用的就是定义一个空的vector,然后一直添加元素
- * 初始化的是一个列表时，只能使用{}
- * ()初始化只能采用数量、默认值的直接初始化方式
+ * vector 对象定义
+   最常用的就是定义一个空的vector,然后一直添加元素
+----------------------------------------------------
+ * 初始化的是一个元素列表时，只能使用{}
+ * ()初始化只能采用（数量、默认值）的直接初始化方式
  * 自定义类型无默认构造参数时，初始化需指定默认构造
+ --------------------------------
  * vector<T> v;
  * vector(n,elem);
  * vector(v.begin(),v.end());
@@ -25,7 +30,7 @@ using namespace std;
 *******************************************************/
 void func_demo1()
 {
-    vector<int> v1;
+    vector<int> v1;     // 默认初始化 
 
     vector<int> v2(10);
     vector<int> v3(10,2);
@@ -47,6 +52,7 @@ void func_demo1()
 
  //   vector<noDefault> v(10,init);
 }
+
 /********************************************
  * 类型不匹配时的初始化需要考虑构造初始化
  * 编译器会自动识别v1{10}中的10代表数量
@@ -61,35 +67,41 @@ void func_demo2()
 /***********************************************
  * 不能通过 for+i 的方式对vector进行初始化操作
  * vector只支持已经存在的元素值下标访问
- * push_back()添加元素，在队尾添加尾端元素
+ * vector对象添加的时候不能使用范围for()
+ -----------------------------------------
+ 1. vec.push_back(num) 添加元素，在队尾添加尾端元素
+ 2. vec.empty()
+ 3. vec.size()
 ************************************************/
 void func_demo3()
 {
     string word;
     vector<string> text;
+
     while(cin >> word)
         text.push_back(word);
 }
-/**************************************
- * 统计分数段的占比情况
- * vector 下标可用于访问已经存在的元素
-**************************************/
+
+// 统计分数段的占比情况
+// vector 下标可用于访问已经存在的元素
 void func_demo4()
 {
-    vector<unsigned> scores(11,0);
+    vector<unsigned> scores(11,0);  //  初始化为0
     unsigned grade;
+
     while(cin >> grade) {
         if (grade <= 100)
             ++scores[grade/10];
     }
 }
 
-/*******************************************
+/****************************************************
  * 遍历容器vector的方式
- * 1.vector<int>::iterator it_b,it_e
- * 2.for(vector<int>::iterator it = v.begin())
- * 3.for_each(v.begin(),v.end(),function)
-*******************************************/  
+----------------------------------------------
+ 1.vector<int>::iterator it_b, it_e
+ 2.for(vector<int>::iterator it = v.begin())
+ 3.for_each(v.begin(), v.end(), function)
+*****************************************************/  
 void MyPrint(int val)
 {
     cout << val <<endl;
@@ -99,25 +111,24 @@ void test01()
     vector<int> v1;
 
     v1.push_back(10);
-    v1.push_back(10);
-    v1.push_back(10);
     v1.push_back(40);
 
     // first way
     vector<int>::iterator it_b = v1.begin();
     vector<int>::iterator it_e = v1.end();
 
-    while(it_b != it_e)
+    while(it_b != it_e) {
         cout << *it_b << endl;
         it_b++;
-
-    // second way
-    for(vector<int>::iterator it=v1.begin();it!=v1.end();it++) {
-        cout << *it << endl;
     }
 
+    // second way
+    // auto it
+    for(vector<int>::iterator it = v1.begin(); it != v1.end(); it++) 
+        cout << *it << endl;
+
     // third way
-    for_each(v1.begin(),v1.end(),MyPrint);
+    for_each(v1.begin(), v1.end(), MyPrint);
 
 }
 
@@ -179,7 +190,7 @@ void test03()
 	v.push_back(v4);
 
     for(vector<vector<int> >::iterator it = v.begin();it != v.end();it++)
-        for(vector<int>::iterator vit = (*it).begin();vit != (*it).end;vit++)
+        for(vector<int>::iterator vit = (*it).begin();vit != (*it).end();vit++)
             cout << *vit << endl;
 }
 
