@@ -7,8 +7,8 @@
 
 typedef struct _treenode {
     int data;
-    struct _treeenode *lchild;
-    struct _treeenode *rchild;
+    struct _treenode *lchild;
+    struct _treenode *rchild;
 }Tnode,Tree;
 
 void binarytree_create(Tree **root)
@@ -16,10 +16,6 @@ void binarytree_create(Tree **root)
     int a = 0;
 	printf("\r\n输入节点数值((当输入为100时，当前节点创建完成))):");
 	scanf("%d",&a);
-
-    *root = (Tnode *)malloc(sizeof(Tnode));
-    if (*root == NULL)
-        return;
 
     if (a == 100)
         *root = NULL;
